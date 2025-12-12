@@ -1,0 +1,7 @@
+# 全体共通
+.DS_Store
+node_modules/
+.env
+
+# データベースの永続化データ (Docker)
+postgres_data/

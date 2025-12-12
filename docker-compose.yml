@@ -1,0 +1,17 @@
+version: '3.8' # ←ここは消してもしなくてもOK
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: portfolio-db
+    ports:
+      - "5433:5432" # 【変更】左側を 5433 に変える
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: portfolio_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
