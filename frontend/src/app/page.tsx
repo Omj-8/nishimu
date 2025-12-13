@@ -1,115 +1,75 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { getTileImage } from '@/utils/mahjong';
+import Link from 'next/link';
 
-// データの型定義 (BackendのProblem構造体に対応)
 type Problem = {
   ID: number;
-  hand_tiles: string; // JSON文字列として来る ("[0,1,2...]")
-  dora_tiles: string; // JSON文字列 ("[27]")
-  wind: string;
   round: string;
+  wind: string;
   score: number;
+  // 一覧では牌データまでは表示しなくていいので省略
 };
 
-export default function Home() {
-  const [problem, setProblem] = useState<Problem | null>(null);
-  // 文字列JSONをパースして配列にしたものを入れるstate
-  const [handTiles, setHandTiles] = useState<number[]>([]);
-  const [doraTiles, setDoraTiles] = useState<number[]>([]);
+export default function ProblemList() {
+  const [problems, setProblems] = useState<Problem[]>([]);
 
   useEffect(() => {
-    fetchProblem();
+    const fetchProblems = async () => {
+      try {
+        const res = await fetch('http://localhost:8080/problems');
+        if (!res.ok) throw new Error('Failed to fetch list');
+        const data = await res.json();
+        setProblems(data);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    fetchProblems();
   }, []);
 
-  const fetchProblem = async () => {
-    try {
-      // APIからランダムな問題を取得
-      const res = await fetch('http://localhost:8080/problems/random');
-      if (!res.ok) throw new Error('Failed to fetch');
-      
-      const data: Problem = await res.json();
-      setProblem(data);
-
-      // 重要: バックエンドから来た文字列 "[0,1...]" を 配列 [0,1...] に変換
-      setHandTiles(JSON.parse(data.hand_tiles));
-      setDoraTiles(JSON.parse(data.dora_tiles));
-
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  if (!problem) return <div className="text-white text-center mt-20">Loading problem...</div>;
-
   return (
-    <div className="min-h-screen bg-green-800 flex flex-col items-center justify-center p-4 font-sans">
-      
-      {/* ゲームテーブル風のコンテナ */}
-      <div className="bg-green-700 p-8 rounded-xl shadow-2xl border-4 border-green-900 w-full max-w-4xl">
-        
-        {/* 情報パネル */}
-        <div className="flex justify-between items-center text-white mb-8 bg-black/30 p-4 rounded-lg">
-          <div className="text-xl font-bold">
-            {problem.round}局 / {problem.wind}家
-          </div>
-          <div className="text-2xl font-mono bg-black/50 px-4 py-1 rounded">
-            {problem.score.toLocaleString()} 点
-          </div>
-        </div>
+    <div className="min-h-screen bg-gray-900 text-white p-8 font-sans">
+      <h1 className="text-4xl font-bold mb-8 text-center border-b border-gray-700 pb-4">
+        🀄 麻雀配牌評価 - 問題一覧
+      </h1>
 
-        {/* ドラ表示 */}
-        <div className="mb-6 flex items-center gap-4">
-          <span className="text-yellow-400 font-bold bg-black/40 px-3 py-1 rounded">DORA</span>
-          <div className="flex gap-1">
-             {/* ドラ表示牌 */}
-             {doraTiles.map((tileId, idx) => (
-              <img 
-                key={`dora-${idx}`} 
-                src={getTileImage(tileId)} 
-                alt="dora" 
-                className="w-10 h-14 shadow-md rounded-sm"
-              />
-            ))}
-            {/* 裏返しの牌（演出用） */}
-            {[...Array(4)].map((_, i) => (
-               <img key={i} src="/tiles/Back.svg" alt="ura" className="w-10 h-14 opacity-70" />
-            ))}
-          </div>
-        </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+        {problems.map((problem) => (
+          <Link 
+            href={`/problems/${problem.ID}`} 
+            key={problem.ID}
+            className="block group"
+          >
+            <div className="bg-gray-800 border border-gray-700 rounded-xl p-6 hover:bg-gray-700 transition shadow-lg hover:shadow-green-900/20 hover:border-green-500/50">
+              <div className="flex justify-between items-center mb-4">
+                <span className="bg-green-700 text-xs px-2 py-1 rounded font-bold">
+                  Problem #{problem.ID}
+                </span>
+                <span className="text-gray-400 text-sm">
+                  {new Date().toLocaleDateString()} {/* 本来は作成日を入れる */}
+                </span>
+              </div>
+              
+              <div className="text-2xl font-bold mb-2 text-green-100">
+                {problem.round}局 {problem.wind}家
+              </div>
+              
+              <div className="text-xl font-mono text-yellow-400">
+                {problem.score.toLocaleString()} 点
+              </div>
 
-        {/* 手牌 (メインコンテンツ) */}
-        <div className="bg-green-600/50 p-6 rounded-lg border-b-8 border-black/20">
-          <div className="flex flex-wrap justify-center gap-1 sm:gap-2">
-            {handTiles.map((tileId, idx) => (
-              <img
-                key={`hand-${idx}`}
-                src={getTileImage(tileId)}
-                alt={`tile-${tileId}`}
-                // 理牌されている前提で、最後の1枚（ツモ牌）だけ少し離す演出を入れるならここで調整
-                // 今回は単純に並べる
-                className="w-12 h-16 sm:w-16 sm:h-24 shadow-xl hover:-translate-y-2 transition-transform cursor-pointer"
-              />
-            ))}
-          </div>
-        </div>
-
-        {/* アクションボタン (仮) */}
-        <div className="mt-10 text-center">
-            <p className="text-green-200 mb-4 text-sm">この配牌の価値を評価してください</p>
-            <input type="range" className="w-64 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer" />
-        </div>
-
+              <div className="mt-4 text-right text-sm text-green-400 opacity-0 group-hover:opacity-100 transition-opacity">
+                挑戦する →
+              </div>
+            </div>
+          </Link>
+        ))}
       </div>
-      
-      {/* デバッグ用リロードボタン */}
-      <button 
-        onClick={fetchProblem}
-        className="mt-8 text-white/50 hover:text-white underline text-sm"
-      >
-        別の問題をロード (今は1問しかありません)
-      </button>
+
+      {problems.length === 0 && (
+        <p className="text-center text-gray-500 mt-20">問題が見つかりません...</p>
+      )}
     </div>
   );
 }
