@@ -25,14 +25,20 @@ export default function Header() {
   };
 
   return (
-    <header className="bg-gray-800 border-b border-gray-700 text-white py-4 px-6 flex justify-between items-center shadow-md">
-      {/* 左側: ロゴ（クリックでトップへ） */}
-      <Link href="/" className="text-xl font-bold text-green-400 hover:text-green-300 transition">
-        🀄 Mahjong Eval
+    <header className="bg-gray-900 border-b border-gray-800 text-white py-4 px-6 flex justify-between items-center z-50 relative">
+      {/* ロゴはトップページ (/) へ */}
+      <Link href="/" className="text-xl font-bold flex items-center gap-2 hover:opacity-80 transition">
+        <span className="text-2xl">🀄</span>
+        <span className="bg-clip-text text-transparent bg-gradient-to-r from-green-400 to-emerald-500">
+          Mahjong Eval
+        </span>
       </Link>
 
       {/* 右側: ナビゲーション */}
       <nav className="flex items-center gap-6">
+        <Link href="/problems" className="text-sm text-gray-300 hover:text-white transition">
+          問題一覧
+        </Link>
         {user ? (
           // ログインしている場合
           <>

@@ -17,9 +17,15 @@ func main() {
 
 	http.HandleFunc("/signup", controllers.Signup) // ★追加
     http.HandleFunc("/login", controllers.Login)   // ★追加
+	// 投票機能
+    http.HandleFunc("/votes", controllers.CastVote) // POST: 投票する
 
 	// 一覧取得: /problems (完全一致)
 	http.HandleFunc("/problems", controllers.GetAllProblems)
+
+	http.HandleFunc("/results", controllers.GetProblemResult) 
+
+    fmt.Println("Backend server is running...")
 
 	// 詳細取得: /problems/ (前方一致でIDを受け取る)
 	// 例: /problems/1

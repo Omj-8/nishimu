@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { getTileImage } from '@/utils/mahjong';
 import { useParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 
 // データの型定義
 type Problem = {
@@ -17,6 +18,7 @@ type Problem = {
 export default function ProblemDetail() {
   const params = useParams(); // URLからIDを取得
   const [problem, setProblem] = useState<Problem | null>(null);
+  const router = useRouter();
   
   // JSONをパースした後のデータを入れるstate
   const [handTiles, setHandTiles] = useState<number[]>([]);
@@ -49,6 +51,34 @@ export default function ProblemDetail() {
       console.error(err);
     }
   };
+
+  const handleVote = async () => {
+      // 本来はログインユーザーIDを取得すべきですが、今は仮で 0 または LocalStorageから取得
+      // const user = JSON.parse(localStorage.getItem('user') || '{}');
+      
+      const voteData = {
+        problem_id: problem?.ID, // ※注意: Problem型定義に合わせてください
+        point: rating,
+        // user_id: user.ID || 0 
+      };
+
+      try {
+        const res = await fetch('http://localhost:8080/votes', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(voteData),
+        });
+
+        if (!res.ok) throw new Error('Vote failed');
+
+        // 結果ページへ遷移 (自分のスコアをクエリで渡す)
+        router.push(`/problems/${params.id}/result?score=${rating}`);
+
+      } catch (err) {
+        alert('投票に失敗しました');
+        console.error(err);
+      }
+    };
 
   if (!problem) return <div className="text-white text-center mt-20">Loading problem...</div>;
 
@@ -129,8 +159,8 @@ export default function ProblemDetail() {
 
           {/* 投票ボタン */}
           <button
-            className="mt-6 bg-yellow-500 hover:bg-yellow-400 text-black font-bold py-3 px-8 rounded-full shadow-lg transform transition hover:scale-105"
-            onClick={() => alert(`${rating}点で投票します（未実装）`)}
+            className="mt-6 bg-yellow-500 hover:bg-yellow-400 ..."
+            onClick={handleVote} // ★ここを alert から関数に変更
           >
             投票する
           </button>
