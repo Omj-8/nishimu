@@ -59,3 +59,48 @@ func GetProblemByID(w http.ResponseWriter, r *http.Request) {
 
 	json.NewEncoder(w).Encode(problem)
 }
+
+// 3. 問題の新規作成 (POST /problems)
+func CreateProblem(w http.ResponseWriter, r *http.Request) {
+	SetupResponse(&w)
+	if r.Method == http.MethodOptions { return }
+
+	var problem models.Problem
+	// フロントから送られてくるJSONを解析
+	if err := json.NewDecoder(r.Body).Decode(&problem); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	// DBに保存
+	if err := database.DB.Create(&problem).Error; err != nil {
+		http.Error(w, "Failed to create problem", http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(problem)
+}
+
+// 4. 問題の削除 (DELETE /problems/{id})
+func DeleteProblem(w http.ResponseWriter, r *http.Request) {
+	SetupResponse(&w)
+	if r.Method == http.MethodOptions { return }
+
+	idStr := strings.TrimPrefix(r.URL.Path, "/problems/")
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		http.Error(w, "Invalid ID", http.StatusBadRequest)
+		return
+	}
+
+	// 物理削除 (本当に消す)
+	result := database.DB.Unscoped().Delete(&models.Problem{}, id)
+	if result.Error != nil {
+		http.Error(w, "Failed to delete", http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]string{"message": "Deleted"})
+}
