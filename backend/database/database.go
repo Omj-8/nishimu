@@ -35,7 +35,7 @@ func Connect() {
 
 	// 1. マイグレーション (テーブル作成)
 	// Todo を削除し、Problem と Vote を追加
-	err = DB.AutoMigrate(&models.Problem{}, &models.Vote{})
+	err = DB.AutoMigrate(&models.Problem{}, &models.Vote{}, &models.User{})
 	if err != nil {
 		log.Fatal("Failed to migrate database:", err)
 	}

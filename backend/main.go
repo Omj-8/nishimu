@@ -15,6 +15,9 @@ func main() {
 	// ルーティング設定
 	// ---------------------------
 
+	http.HandleFunc("/signup", controllers.Signup) // ★追加
+    http.HandleFunc("/login", controllers.Login)   // ★追加
+
 	// 一覧取得: /problems (完全一致)
 	http.HandleFunc("/problems", controllers.GetAllProblems)
 
