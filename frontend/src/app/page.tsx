@@ -12,7 +12,7 @@ export default function LandingPage() {
         {/* タイトルエリア */}
         <h1 className="text-6xl md:text-7xl font-extrabold mb-6 tracking-tight">
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-600">
-            Mahjong
+            麻雀
           </span>
           <br />
           Evaluator
