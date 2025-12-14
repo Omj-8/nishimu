@@ -15,8 +15,8 @@ func main() {
 	// ルーティング設定
 	// ---------------------------
 
-	http.HandleFunc("/signup", controllers.Signup) // ★追加
-    http.HandleFunc("/login", controllers.Login)   // ★追加
+	http.HandleFunc("/signup", controllers.Signup)
+    http.HandleFunc("/login", controllers.Login)
 	// 投票機能
     http.HandleFunc("/votes", controllers.CastVote) // POST: 投票する
 
