@@ -19,7 +19,7 @@ export default function LandingPage() {
         </h1>
 
         <p className="text-gray-400 text-lg md:text-xl mb-10 leading-relaxed">
-          あなたの配牌判断は、多数派か？それとも異端か？<br />
+          あなたの配牌価値観は、多数派か？それとも異端か？<br />
           集合知で麻雀の「感覚」を可視化するプラットフォーム。
         </p>
 
