@@ -34,7 +34,7 @@ export default function AdminDashboard() {
 
   return (
     <div className="min-h-screen bg-gray-900 text-white p-8 font-sans">
-      <div className="flex justify-between items-center mb-8 max-w-4xl mx-auto">
+      <div className="flex justify-between items-center mb-8 max-w-6xl mx-auto">
         <h1 className="text-3xl font-bold">管理者ダッシュボード</h1>
         <Link 
           href="/admin/create" 
@@ -44,7 +44,20 @@ export default function AdminDashboard() {
         </Link>
       </div>
 
-      <div className="max-w-4xl mx-auto bg-gray-800 rounded-xl overflow-hidden shadow-xl border border-gray-700">
+      {/* ナビゲーションタブ */}
+      <div className="flex gap-4 mb-8 max-w-6xl mx-auto">
+        <button className="bg-green-600 hover:bg-green-500 px-6 py-2 rounded-full font-bold transition">
+          問題管理
+        </button>
+        <Link 
+          href="/admin/users"
+          className="bg-gray-700 hover:bg-gray-600 px-6 py-2 rounded-full font-bold transition"
+        >
+          ユーザー管理
+        </Link>
+      </div>
+
+      <div className="max-w-6xl mx-auto bg-gray-800 rounded-xl overflow-hidden shadow-xl border border-gray-700">
         <table className="w-full text-left border-collapse">
           <thead className="bg-gray-700 text-gray-300">
             <tr>
