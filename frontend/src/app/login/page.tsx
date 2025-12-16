@@ -28,7 +28,9 @@ export default function Login() {
       localStorage.setItem('user', JSON.stringify(user));
       
       alert(`ようこそ、${user.name}さん！`);
-      router.push('/problems'); // 問題一覧ページへ移動
+      
+      // ページをリロードしてHeaderの状態を更新
+      window.location.href = '/problems';
 
     } catch (err) {
       alert('メールアドレスまたはパスワードが間違っています。');

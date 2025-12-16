@@ -26,7 +26,8 @@ export default function Header() {
     localStorage.removeItem('user'); // 名札を捨てる
     setUser(null);
     alert('ログアウトしました');
-    router.push('/login'); // ログイン画面へ飛ばす
+    // ページをリロードして状態をリセット
+    window.location.href = '/login';
   };
 
   return (
