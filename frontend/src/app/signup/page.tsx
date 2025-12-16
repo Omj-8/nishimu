@@ -10,6 +10,7 @@ export default function Signup() {
     name: '',
     email: '',
     password: '',
+    role: 'user', // 追加: デフォルトは一般ユーザー
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -69,6 +70,20 @@ export default function Signup() {
               onChange={(e) => setFormData({ ...formData, password: e.target.value })}
               required
             />
+          </div>
+
+          {/* 開発用: 管理者として登録 */}
+          <div className="flex items-center gap-2 bg-yellow-900/20 p-3 rounded border border-yellow-700/50">
+            <input
+              type="checkbox"
+              id="isAdmin"
+              checked={formData.role === 'admin'}
+              onChange={(e) => setFormData({ ...formData, role: e.target.checked ? 'admin' : 'user' })}
+              className="w-4 h-4"
+            />
+            <label htmlFor="isAdmin" className="text-sm text-yellow-400 cursor-pointer">
+              🔧 管理者として登録（開発用）
+            </label>
           </div>
 
           <button
