@@ -53,13 +53,19 @@ export default function ProblemDetail() {
   };
 
   const handleVote = async () => {
-      // 本来はログインユーザーIDを取得すべきですが、今は仮で 0 または LocalStorageから取得
-      // const user = JSON.parse(localStorage.getItem('user') || '{}');
+      // ログインユーザーIDを取得
+      const userStr = localStorage.getItem('user');
+      if (!userStr) {
+        alert('ログインしてください');
+        router.push('/login');
+        return;
+      }
+      const user = JSON.parse(userStr);
       
       const voteData = {
-        problem_id: problem?.ID, // ※注意: Problem型定義に合わせてください
+        problem_id: problem?.ID,
+        user_id: user.ID,
         point: rating,
-        // user_id: user.ID || 0 
       };
 
       try {

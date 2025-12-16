@@ -4,9 +4,14 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
+type User = {
+  name: string;
+  role: string;
+};
+
 export default function Header() {
   const router = useRouter();
-  const [user, setUser] = useState<{ name: string } | null>(null);
+  const [user, setUser] = useState<User | null>(null);
 
   // 画面が表示されたら、localStorageを見てログイン中かチェック
   useEffect(() => {
@@ -42,6 +47,11 @@ export default function Header() {
         {user ? (
           // ログインしている場合
           <>
+            {user.role === 'admin' && (
+              <Link href="/admin" className="text-sm text-blue-400 hover:text-blue-300 transition font-bold">
+                🔧 管理画面
+              </Link>
+            )}
             <span className="text-gray-300 text-sm">
               User: <span className="text-white font-semibold">{user.name}</span>
             </span>

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 type User = {
   ID: number;
@@ -12,12 +13,27 @@ type User = {
 };
 
 export default function AdminUsersPage() {
+  const router = useRouter();
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isAuthorized, setIsAuthorized] = useState(false);
 
   useEffect(() => {
+    // 管理者認可チェック
+    const storedUser = localStorage.getItem('user');
+    if (!storedUser) {
+      router.push('/login');
+      return;
+    }
+    const user = JSON.parse(storedUser);
+    if (user.role !== 'admin') {
+      alert('管理者のみアクセス可能です');
+      router.push('/problems');
+      return;
+    }
+    setIsAuthorized(true);
     fetchUsers();
-  }, []);
+  }, [router]);
 
   const fetchUsers = async () => {
     try {
@@ -47,23 +63,29 @@ export default function AdminUsersPage() {
 
   return (
     <div className="min-h-screen bg-gray-900 text-white p-8 font-sans">
-      <div className="max-w-6xl mx-auto">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold">ユーザー管理</h1>
-          <Link
-            href="/admin"
-            className="bg-gray-700 hover:bg-gray-600 px-6 py-2 rounded-full font-bold transition"
-          >
-            ← 戻る
-          </Link>
+      {!isAuthorized && (
+        <div className="flex items-center justify-center h-screen">
+          <div className="text-gray-400">認可チェック中...</div>
         </div>
+      )}
+      {isAuthorized && (
+        <div className="max-w-6xl mx-auto">
+          <div className="flex justify-between items-center mb-8">
+            <h1 className="text-3xl font-bold">ユーザー管理</h1>
+            <Link
+              href="/admin"
+              className="bg-gray-700 hover:bg-gray-600 px-6 py-2 rounded-full font-bold transition"
+            >
+              ← 戻る
+            </Link>
+          </div>
 
-        {loading ? (
-          <div className="text-center text-gray-400">読み込み中...</div>
-        ) : users.length === 0 ? (
-          <div className="text-center text-gray-400">ユーザーはまだいません</div>
-        ) : (
-          <div className="bg-gray-800 rounded-xl overflow-hidden shadow-xl border border-gray-700">
+          {loading ? (
+            <div className="text-center text-gray-400">読み込み中...</div>
+          ) : users.length === 0 ? (
+            <div className="text-center text-gray-400">ユーザーはまだいません</div>
+          ) : (
+            <div className="bg-gray-800 rounded-xl overflow-hidden shadow-xl border border-gray-700">
             <table className="w-full text-left border-collapse">
               <thead className="bg-gray-700 text-gray-300">
                 <tr>
@@ -119,30 +141,31 @@ export default function AdminUsersPage() {
               </tbody>
             </table>
           </div>
-        )}
+          )}
 
-        <div className="mt-8 bg-gray-800 rounded-xl p-6 border border-gray-700">
-          <h2 className="text-xl font-bold mb-4">統計情報</h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="bg-gray-700 rounded-lg p-4 text-center">
-              <div className="text-3xl font-bold text-green-400">{users.length}</div>
-              <div className="text-sm text-gray-400">登録ユーザー数</div>
-            </div>
-            <div className="bg-gray-700 rounded-lg p-4 text-center">
-              <div className="text-3xl font-bold text-blue-400">
-                {users.filter(u => u.role === 'admin').length}
+          <div className="mt-8 bg-gray-800 rounded-xl p-6 border border-gray-700">
+            <h2 className="text-xl font-bold mb-4">統計情報</h2>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="bg-gray-700 rounded-lg p-4 text-center">
+                <div className="text-3xl font-bold text-green-400">{users.length}</div>
+                <div className="text-sm text-gray-400">登録ユーザー数</div>
               </div>
-              <div className="text-sm text-gray-400">管理者数</div>
-            </div>
-            <div className="bg-gray-700 rounded-lg p-4 text-center">
-              <div className="text-3xl font-bold text-purple-400">
-                {users.filter(u => u.role === 'user').length}
+              <div className="bg-gray-700 rounded-lg p-4 text-center">
+                <div className="text-3xl font-bold text-blue-400">
+                  {users.filter(u => u.role === 'admin').length}
+                </div>
+                <div className="text-sm text-gray-400">管理者数</div>
               </div>
-              <div className="text-sm text-gray-400">一般ユーザー数</div>
+              <div className="bg-gray-700 rounded-lg p-4 text-center">
+                <div className="text-3xl font-bold text-purple-400">
+                  {users.filter(u => u.role === 'user').length}
+                </div>
+                <div className="text-sm text-gray-400">一般ユーザー数</div>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

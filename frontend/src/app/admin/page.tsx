@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 type Problem = {
   ID: number;
@@ -11,11 +12,26 @@ type Problem = {
 };
 
 export default function AdminDashboard() {
+  const router = useRouter();
   const [problems, setProblems] = useState<Problem[]>([]);
+  const [isAuthorized, setIsAuthorized] = useState(false);
 
   useEffect(() => {
+    // 管理者認可チェック
+    const storedUser = localStorage.getItem('user');
+    if (!storedUser) {
+      router.push('/login');
+      return;
+    }
+    const user = JSON.parse(storedUser);
+    if (user.role !== 'admin') {
+      alert('管理者のみアクセス可能です');
+      router.push('/problems');
+      return;
+    }
+    setIsAuthorized(true);
     fetchProblems();
-  }, []);
+  }, [router]);
 
   const fetchProblems = async () => {
     const res = await fetch('http://localhost:8080/problems');
@@ -31,6 +47,10 @@ export default function AdminDashboard() {
     // 画面から消す
     setProblems(problems.filter(p => p.ID !== id));
   };
+
+  if (!isAuthorized) {
+    return <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">認可チェック中...</div>;
+  }
 
   return (
     <div className="min-h-screen bg-gray-900 text-white p-8 font-sans">

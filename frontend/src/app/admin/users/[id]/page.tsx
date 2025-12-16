@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 
 type Vote = {
   ID: number;
@@ -22,13 +23,28 @@ type UserVoteStats = {
 
 export default function UserDetailPage() {
   const params = useParams();
+  const router = useRouter();
   const userId = params.id as string;
   const [stats, setStats] = useState<UserVoteStats | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isAuthorized, setIsAuthorized] = useState(false);
 
   useEffect(() => {
+    // 管理者認可チェック
+    const storedUser = localStorage.getItem('user');
+    if (!storedUser) {
+      router.push('/login');
+      return;
+    }
+    const user = JSON.parse(storedUser);
+    if (user.role !== 'admin') {
+      alert('管理者のみアクセス可能です');
+      router.push('/problems');
+      return;
+    }
+    setIsAuthorized(true);
     fetchUserVotes();
-  }, [userId]);
+  }, [userId, router]);
 
   const fetchUserVotes = async () => {
     try {
