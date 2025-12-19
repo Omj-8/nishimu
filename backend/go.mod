@@ -1,6 +1,6 @@
 module portfolio-backend
 
-go 1.22
+go 1.25.5
 
 require (
 	github.com/jackc/pgpassfile v1.0.0 // indirect
