@@ -16,6 +16,20 @@ func main() {
 	// ルーティング設定
 	// ---------------------------
 
+	// ルートとヘルスチェック
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/" {
+			http.NotFound(w, r)
+			return
+		}
+		w.Header().Set("Content-Type", "application/json")
+		w.Write([]byte(`{"status":"ok","service":"portfolio-backend"}`))
+	})
+	http.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("ok"))
+	})
+
 	http.HandleFunc("/signup", controllers.Signup)
     http.HandleFunc("/login", controllers.Login)
 	// 投票機能
@@ -41,7 +55,7 @@ func main() {
 
 	http.HandleFunc("/results", controllers.GetProblemResult) 
 
-    fmt.Println("Backend server is running...")
+	fmt.Println("Backend server is running...")
 
 	// ユーザー詳細: /users/ (前方一致でIDを受け取る)
 	// 例: DELETE /users/123 (ユーザー削除)

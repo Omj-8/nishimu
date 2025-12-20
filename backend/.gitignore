@@ -7,3 +7,6 @@ main.exe
 
 # その他
 vendor/
+
+# Docker環境（ローカル開発専用）
+Dockerfile
